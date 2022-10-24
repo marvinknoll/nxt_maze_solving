@@ -1,4 +1,6 @@
 from setuptools import setup
+import os
+from glob import glob
 
 package_name = "nxt_maze_solving"
 nxt_maze_solving_util = "nxt_maze_solving/util"
@@ -13,6 +15,14 @@ setup(
         (
             "share/ament_index/resource_index/packages",
             ["resource/" + package_name],
+        ),
+        (
+            os.path.join("share", package_name, "launch"),
+            glob(os.path.join("launch", "*.launch.py")),
+        ),
+        (
+            os.path.join("share", package_name, "robot_configs"),
+            glob(os.path.join("robot_configs", "*.yaml")),
         ),
         ("share/" + package_name, ["package.xml"]),
     ],
