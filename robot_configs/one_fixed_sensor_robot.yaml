@@ -1,18 +1,9 @@
 /nxt_ros_setup:
   ros__parameters:
     devices:
-      1:
-        sensor_type: touch
-        sensor_name: touch_sensor
       3:
         sensor_type: color
         sensor_name: color_sensor
-      A:
-        motor_type: other
-        motor_name: radar_motor
-        motor_mimic_name: radar
-        motor_mimic_gear_ratio: -0.33333
-        invert_direction: false
       B:
         motor_type: wheel_motor_l
         motor_name: wheel_motor_l

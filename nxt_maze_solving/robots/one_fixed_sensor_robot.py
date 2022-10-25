@@ -27,10 +27,6 @@ class OneFixedSensorRobot(generic_robot.Robot):
         self._scan_intersection_centre_odom = None
         self._scan_turned_left = False
 
-        self._action_client = rclpy.action.ActionClient(
-            self, nxt_msgs2.action.TurnMotor, "wheel_motor_r_turn"
-        )
-
         self._last_odom_msg: Union[nav_msgs.msg.Odometry, None] = None
         self.create_subscription(
             nav_msgs.msg.Odometry, "odom", self._cb_odom, 10
