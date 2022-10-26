@@ -17,12 +17,12 @@ class OneFixedSensorRobot(generic_robot.Robot):
         super().__init__(name, maze_properties)
 
         self._realign_positions = [20, -40, 60, -60, -5]
-        self._realign_effort = 20.0
+        self._realign_velocity = 0.29
         self._realign_start_yaw_z = None
         self._realign_idx = 0
 
-        self._scan_reposition_effort = 40.0
-        self._scan_turning_effort = 30.0
+        self._scan_reposition_velocity = 0.0456
+        self._scan_turning_velocity = 0.5079
         self._scan_start_position = None
         self._scan_intersection_centre_odom = None
         self._scan_turned_left = False
@@ -38,13 +38,22 @@ class OneFixedSensorRobot(generic_robot.Robot):
     def on_intersection(
         self, color_values: List[helper_classes.Color]
     ) -> bool:
-        return color_values[1] == self.maze_propeties.intersection_color
+        return (
+            color_values[1] == self.maze_propeties.intersection_color
+            or self.scanning_intersection
+        )
 
     def off_line(self, color_values: List[helper_classes.Color]) -> bool:
-        return color_values[1] == self.maze_propeties.background_color
+        return (
+            color_values[1] == self.maze_propeties.background_color
+            and not self.scanning_intersection
+        )
 
     def on_line(self, color_values: List[helper_classes.Color]) -> bool:
-        return color_values[1] == self.maze_propeties.line_color
+        return (
+            color_values[1] == self.maze_propeties.line_color
+            and not self.scanning_intersection
+        )
 
     def on_start(self, color_values: List[helper_classes.Color]) -> bool:
         return color_values[1] == self.maze_propeties.start_color
@@ -59,7 +68,7 @@ class OneFixedSensorRobot(generic_robot.Robot):
         dist = math.sqrt(math.pow(delta_x, 2) + math.pow(delta_y, 2))
 
         if dist < 0.11:  # reposition on intersection centre
-            self.drive_straight(self._scan_reposition_effort)
+            self.drive_straight(self._scan_reposition_velocity)
             return
 
         if self._scan_intersection_centre_odom is None:
@@ -79,19 +88,19 @@ class OneFixedSensorRobot(generic_robot.Robot):
                 if (current_yaw_z > 45 and current_yaw_z < 180) or (
                     current_yaw_z < -135 and current_yaw_z > -180
                 ):
-                    self.turn_left(self._scan_turning_effort)
+                    self.turn_left(self._scan_turning_velocity)
                 else:
                     self._scan_turned_left = True
             elif initial_yaw_z < 45 and initial_yaw_z > -45:
                 # Faced NORTH at start
                 if current_yaw_z < 135:
-                    self.turn_left(self._scan_turning_effort)
+                    self.turn_left(self._scan_turning_velocity)
                 else:
                     self._scan_turned_left = True
             elif initial_yaw_z < -45 and initial_yaw_z > -135:
                 # Faced EAST at start
                 if current_yaw_z < 45:
-                    self.turn_left(self._scan_turning_effort)
+                    self.turn_left(self._scan_turning_velocity)
                 else:
                     self._scan_turned_left = True
             elif (initial_yaw_z < -135 and delta_y > -180) or (
@@ -101,12 +110,12 @@ class OneFixedSensorRobot(generic_robot.Robot):
                 if (current_yaw_z > 135 and current_yaw_z > 180) or (
                     current_yaw_z < -45 and current_yaw_z > -180
                 ):
-                    self.turn_left(self._scan_turning_effort)
+                    self.turn_left(self._scan_turning_velocity)
                 else:
                     self._scan_turned_left = True
         else:
             # Turn right and scan
-            self.turn_right(self._scan_turning_effort)
+            self.turn_right(self._scan_turning_velocity)
 
         if not self._scan_turned_left:
             return
@@ -131,12 +140,12 @@ class OneFixedSensorRobot(generic_robot.Robot):
         self._scan_intersection_centre_odom = None
         self._scan_turned_left = False
 
-    def realign(self):
+    def realign(self, color_values: List[helper_classes.Color]):
         if self._last_odom_msg is None:
             return
 
         if self._realign_start_yaw_z is None:
-            self.stop_motors()
+            self.stop_driving_motors()
             start_orientation = self._last_odom_msg.pose.pose.orientation
             _, _, _yaw_z = helper_functions.euler_from_quaternion(
                 start_orientation.x,
@@ -162,18 +171,18 @@ class OneFixedSensorRobot(generic_robot.Robot):
             current_turning_goal = self._realign_positions[self._realign_idx]
 
             if current_turning_goal > 0 and delt_yaw_z < current_turning_goal:
-                self.turn_left(self._realign_effort)
+                self.turn_left(self._realign_velocity)
             elif (
                 current_turning_goal < 0 and delt_yaw_z > current_turning_goal
             ):
-                self.turn_right(self._realign_effort)
+                self.turn_right(self._realign_velocity)
             else:
                 if self._realign_idx < len(self._realign_positions) - 1:
-                    self.stop_motors()
+                    self.stop_driving_motors()
                     self._realign_idx += 1
                 else:
                     self.get_logger().info("Realignment failed")
-                    self.stop_motors()
+                    self.stop_driving_motors()
 
     def reset_realign(self):
         self._realign_idx = 0

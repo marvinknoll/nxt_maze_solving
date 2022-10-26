@@ -3,7 +3,9 @@ from abc import ABC, abstractmethod
 
 import nxt_maze_solving.util.helper_classes as helper_classes
 
-import nxt_msgs2
+import nxt_msgs2.msg
+import geometry_msgs.msg
+
 from typing import List
 
 
@@ -17,15 +19,13 @@ class Robot(ABC, rclpy.node.Node):
             nxt_msgs2.msg.JointEffort, "joint_effort", 10
         )
 
-        self.straight_forward_effort: float = 50.0
-        self.end_scan_forward_effort: float = 20.0
-        self.scanning_intersection: bool = False
-        self.realigning: bool = False
+        self._cmd_vel_pub = self.create_publisher(
+            geometry_msgs.msg.TwistStamped, "cmd_vel", 10
+        )
 
-        self._je_r = nxt_msgs2.msg.JointEffort()
-        self._je_r.joint_name = "wheel_motor_r"
-        self._je_l = nxt_msgs2.msg.JointEffort()
-        self._je_l.joint_name = "wheel_motor_l"
+        self.straight_forward_velocity: float = 0.0565
+        self.end_scan_forward_velocity: float = 0.6772
+        self.scanning_intersection: bool = False
 
     @abstractmethod
     def on_end(self, color_values: List[helper_classes.Color]) -> bool:
@@ -50,7 +50,7 @@ class Robot(ABC, rclpy.node.Node):
         pass
 
     @abstractmethod
-    def stop_motors(self):
+    def stop_driving_motors(self):
         pass
 
     @abstractmethod
@@ -58,53 +58,51 @@ class Robot(ABC, rclpy.node.Node):
         pass
 
     @abstractmethod
-    def realign(self):
+    def realign(self, color_values: List[helper_classes.Color]):
         pass
 
     @abstractmethod
     def reset_realign(self):
         pass
 
-    def drive_straight(self, effort: float):
-        # self.get_logger().info("driving straight")
-        self._je_r.header.stamp = self.get_clock().now().to_msg()
-        self._je_r.effort = -effort
+    def drive_straight(self, linear_velocity: float):
+        twist_msg = geometry_msgs.msg.TwistStamped()
+        twist_msg.header.stamp = self.get_clock().now().to_msg()
+        twist_msg.twist.linear.x = linear_velocity
+        twist_msg.twist.linear.y = 0.0
+        twist_msg.twist.linear.z = 0.0
+        twist_msg.twist.angular.x = 0.0
+        twist_msg.twist.angular.y = 0.0
+        twist_msg.twist.angular.z = 0.0
 
-        self._je_l.header.stamp = self.get_clock().now().to_msg()
-        self._je_l.effort = -effort
+        self._cmd_vel_pub.publish(twist_msg)
 
-        self._je_pub.publish(self._je_r)
-        self._je_pub.publish(self._je_l)
+    def stop_driving_motors(self):
+        twist_msg = geometry_msgs.msg.TwistStamped()
+        twist_msg.header.stamp = self.get_clock().now().to_msg()
+        twist_msg.twist.linear.x = 0.0
+        twist_msg.twist.linear.y = 0.0
+        twist_msg.twist.linear.z = 0.0
+        twist_msg.twist.angular.x = 0.0
+        twist_msg.twist.angular.y = 0.0
+        twist_msg.twist.angular.z = 0.0
 
-    def stop_motors(self):
-        # self.get_logger().info("Stopping motors")
-        self._je_r.header.stamp = self.get_clock().now().to_msg()
-        self._je_r.effort = 0.0
+        self._cmd_vel_pub.publish(twist_msg)
 
-        self._je_l.header.stamp = self.get_clock().now().to_msg()
-        self._je_l.effort = 0.0
+    def _turn(self, angular_velocity: float):
+        twist_msg = geometry_msgs.msg.TwistStamped()
+        twist_msg.header.stamp = self.get_clock().now().to_msg()
+        twist_msg.twist.linear.x = 0.0
+        twist_msg.twist.linear.y = 0.0
+        twist_msg.twist.linear.z = 0.0
+        twist_msg.twist.angular.x = 0.0
+        twist_msg.twist.angular.y = 0.0
+        twist_msg.twist.angular.z = angular_velocity
 
-        self._je_pub.publish(self._je_r)
-        self._je_pub.publish(self._je_l)
+        self._cmd_vel_pub.publish(twist_msg)
 
-    def turn_right(self, effort: float):
-        # self.get_logger().info("turning right")
-        self._je_r.header.stamp = self.get_clock().now().to_msg()
-        self._je_r.effort = effort
+    def turn_right(self, angular_velocity: float):
+        self._turn(angular_velocity * -1)
 
-        self._je_l.header.stamp = self.get_clock().now().to_msg()
-        self._je_l.effort = -effort
-
-        self._je_pub.publish(self._je_r)
-        self._je_pub.publish(self._je_l)
-
-    def turn_left(self, effort: float):
-        # self.get_logger().info("turning left")
-        self._je_r.header.stamp = self.get_clock().now().to_msg()
-        self._je_r.effort = -effort
-
-        self._je_l.header.stamp = self.get_clock().now().to_msg()
-        self._je_l.effort = effort
-
-        self._je_pub.publish(self._je_r)
-        self._je_pub.publish(self._je_l)
+    def turn_left(self, angular_velocity: float):
+        self._turn(angular_velocity)
