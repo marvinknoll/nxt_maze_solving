@@ -1,5 +1,6 @@
 import nxt_maze_solving.util.helper_classes as helper_classes
 import enum
+from typing import List
 
 
 @enum.unique
@@ -26,3 +27,18 @@ class MazeProperties:
         self.start_color = start_color
         self.intersection_color = intersection_color
         self.end_color = end_color
+
+
+class State:
+    def __init__(self):
+        print("Initialized following state:", str(self))
+
+    def on_event(self, color_values: List[helper_classes.Color]):
+        pass
+
+    def __repr__(self):
+
+        return self.__str__()
+
+    def __str__(self):
+        return self.__class__.__name__

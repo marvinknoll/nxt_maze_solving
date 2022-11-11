@@ -80,3 +80,31 @@ def color_rgba_to_color(
         return helper_classes.Color.WHITE
     else:
         raise Exception("Invalid color message")
+
+
+def degrees_turned_from(
+    initial_odom: nav_msgs.msg.Odometry,
+    current_odom: nav_msgs.msg.Odometry,
+    turning_left: bool,
+):
+    initial_yaw_z = orientation_deg_from_odom(initial_odom)
+    current_yaw_z = orientation_deg_from_odom(current_odom)
+
+    initial_yaw_z_norm = (
+        initial_yaw_z if initial_yaw_z > 0 else 360 + initial_yaw_z
+    )
+    current_yaw_z_norm = (
+        current_yaw_z if current_yaw_z > 0 else 360 + current_yaw_z
+    )
+
+    if turning_left:
+        if initial_yaw_z_norm <= current_yaw_z_norm:
+            return current_yaw_z_norm - initial_yaw_z_norm
+        else:
+            return 360 - initial_yaw_z_norm + current_yaw_z_norm
+    else:
+        if initial_yaw_z_norm >= current_yaw_z_norm:
+            return initial_yaw_z_norm - current_yaw_z_norm
+        else:
+            return 360 - current_yaw_z_norm + initial_yaw_z_norm
+

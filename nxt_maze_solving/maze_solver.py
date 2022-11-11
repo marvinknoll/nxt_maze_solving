@@ -13,9 +13,11 @@ import nxt_msgs2.srv
 
 import nxt_maze_solving.util.helper_functions as helper_functions
 import nxt_maze_solving.util.helper_classes as helper_classes
-import nxt_maze_solving.robots.generic_robot as Robot
+import nxt_maze_solving.robots.generic_robot as generic_robot
 import nxt_maze_solving.robots.one_fixed_sensor_robot as one_fixed_sensor_robot
+import nxt_maze_solving.robots.one_turning_sensor_robot as one_turning_sensor_robot
 
+import sys
 
 from typing import List
 
@@ -24,12 +26,12 @@ class MazeSolver(rclpy.node.Node):
     def __init__(
         self,
         name: str,
-        robot: Robot,
+        robot: generic_robot.Robot,
     ):
         super().__init__(name)
         self._robot = robot
 
-        self._end_color_measured_cnt = 0
+        self._end_color_measurements_cnt = 0
 
         self.colors: List[helper_classes.Color] = [
             helper_classes.Color.GREEN,
@@ -45,7 +47,7 @@ class MazeSolver(rclpy.node.Node):
             nxt_msgs2.msg.JointEffort, "joint_effort", 10
         )
 
-        self.create_timer(0.1, self.solve_maze)
+        self._main_timer = self.create_timer(0.1, self.solve_maze)
 
     def _cb_c_color_read(self, color_msg: nxt_msgs2.msg.Color):
         self.colors[1] = helper_functions.color_rgba_to_color(color_msg)
@@ -53,37 +55,35 @@ class MazeSolver(rclpy.node.Node):
     def solve_maze(self):
         if (
             self._robot.on_intersection(self.colors)
-            or self._robot.scanning_intersection
+            or self._robot.scanning_intersection()
         ):
-            if not self._robot.scanning_intersection:
-                # self.get_logger().info("detected intersection")
-                self._robot.scanning_intersection = True
-
+            # self.get_logger().info("on_intersection")
             self._robot.scan_intersection(self.colors)
             return
 
         if self._robot.on_end(self.colors):
-            # self.get_logger().info("detected end_color")
-            self._end_color_measured_cnt += 1
-            if self._end_color_measured_cnt > 6:
+            # self.get_logger().info("on_end")
+            self._end_color_measurements_cnt += 1
+            if self._end_color_measurements_cnt > 3:
                 self._robot.stop_driving_motors()
+                self._main_timer.cancel()
+                rclpy.shutdown()
 
-        if self._robot.off_line(self.colors):
+        else:
+            self._end_color_measurements_cnt = 0
+
+        if self._robot.off_line(self.colors) or self._robot.realigning():
             # self.get_logger().info("off_line")
             self._robot.realign(self.colors)
 
         if self._robot.on_line(self.colors):
             # self.get_logger().info("on_line")
             self._robot.drive_straight(self._robot.straight_forward_velocity)
-            self._robot.reset_realign()
+            self._robot.reset_realign()  # TODO remove once refactored one_fixed_sensor to state machine
 
         if self._robot.on_start(self.colors):
             # self.get_logger().info("on_start")
             self._robot.drive_straight(self._robot.straight_forward_velocity)
-
-        if not self._robot.on_end(self.colors):
-            # self.get_logger().info("resetting _end_color_measured_cnt")
-            self._end_color_measured_cnt = 0
 
     def destroy_node(self):
         """Destroy the node."""
@@ -101,17 +101,26 @@ def main(args=None):
             background_color=helper_classes.Color.WHITE,
             start_color=helper_classes.Color.GREEN,
             intersection_color=helper_classes.Color.RED,
-            end_color=helper_classes.Color.BLUE,
+            end_color=helper_classes.Color.YELLOW,
         )
-        one_fix_sensor_robot_node = one_fixed_sensor_robot.OneFixedSensorRobot(
-            "one_fix_sensor", maze_properties
-        )
-        maze_solver = MazeSolver("maze_runner", one_fix_sensor_robot_node)
+
+        robot_configuration = sys.argv[1]
+        robot: generic_robot.Robot = None
+        if robot_configuration == "one_fixed":
+            robot = one_fixed_sensor_robot.OneFixedSensorRobot(
+                "one_fix_sensor", maze_properties
+            )
+        elif robot_configuration == "one_turning":
+            robot = one_turning_sensor_robot.OneTurningSensorRobot(
+                maze_properties
+            )
+
+        maze_solver = MazeSolver("maze_runner", robot)
 
         try:
 
             executor.add_node(maze_solver)
-            executor.add_node(one_fix_sensor_robot_node)
+            executor.add_node(robot)
             executor.spin()
         finally:
             maze_solver.destroy_node()
