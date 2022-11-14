@@ -114,13 +114,21 @@ class ScanToRight(robot_states.State):
                 )
 
                 if deg_turned_right < 90:
-                    self._robot.get_logger().info("Took LEFT path")
+                    self._robot.append_intersection_turn(
+                        helper_classes.IntersectionDirection.LEFT
+                    )
                 elif deg_turned_right > 90 and deg_turned_right < 180:
-                    self._robot.get_logger().info("Took STRAIGHT path")
+                    self._robot.append_intersection_turn(
+                        helper_classes.IntersectionDirection.STRAIGHT
+                    )
                 elif deg_turned_right > 180 and deg_turned_right < 270:
-                    self._robot.get_logger().info("Took RIGHT path")
+                    self._robot.append_intersection_turn(
+                        helper_classes.IntersectionDirection.RIGHT
+                    )
                 else:
-                    self._robot.get_logger().info("Took BACK path")
+                    self._robot.append_intersection_turn(
+                        helper_classes.IntersectionDirection.BACK
+                    )
 
             if not self._robot.driving_motors_still():
                 return self

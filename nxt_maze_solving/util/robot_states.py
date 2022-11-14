@@ -27,10 +27,12 @@ class RealignState(State):
     def __init__(
         self,
         robot: generic_robot.Robot,
+        smart_realign: bool = False,
         realign_base_velocity: float = 0.29,
     ):
         self._robot = robot
         self._realign_degrees = [20, -40, 80, -120, 60]
+        self._smart_realign = smart_realign
         self._realign_idx = 0
         self._realign_base_velocity = realign_base_velocity
 
@@ -57,6 +59,17 @@ class RealignState(State):
 
         current_odom = self._robot._last_odom_msg
         current_turning_goal_deg = self._realign_degrees[self._realign_idx]
+
+        if (
+            self._smart_realign
+            and len(self._robot.intersection_directions) > 0
+        ):
+            last_direction_idx = len(self._robot.intersection_directions) - 1
+            last_direction = self._robot.intersection_directions[
+                last_direction_idx
+            ]
+            if last_direction == helper_classes.IntersectionDirection.LEFT:
+                current_turning_goal_deg = current_turning_goal_deg * -1
 
         realign_velocity = self._realign_base_velocity
         if self._realign_idx < 2:

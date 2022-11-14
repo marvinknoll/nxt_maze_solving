@@ -65,7 +65,7 @@ class OneTurningSensorRobot(generic_robot.Robot):
 
     def realign(self, color_values: List[helper_classes.Color]):
         if self._realign_state is None:
-            self._realign_state = robot_states.RealignState(self)
+            self._realign_state = robot_states.RealignState(self, True)
 
         self._realign_state = self._realign_state.on_event(color_values)
 
@@ -194,7 +194,9 @@ class ReorientRobotState(robot_states.State):
     def on_event(self, color_values: List[helper_classes.Color]):
         if self._robot._line_angle is not None:
             if self._robot._line_angle < 45 and self._robot._line_angle > -45:
-                self._robot.get_logger().info("Took STRAIGHT path")
+                self._robot.append_intersection_turn(
+                    helper_classes.IntersectionDirection.STRAIGHT
+                )
                 return ScanIntersectionEndState(self._robot)
 
             if self._robot._line_angle > 45:
@@ -211,7 +213,9 @@ class ReorientRobotState(robot_states.State):
                     self._robot.turn_left(self._angular_velocity)
                     return self
                 else:
-                    self._robot.get_logger().info("Took LEFT path")
+                    self._robot.append_intersection_turn(
+                        helper_classes.IntersectionDirection.LEFT
+                    )
                     self._robot.stop_driving_motors()
                     return ScanIntersectionEndState(self._robot)
 
@@ -229,10 +233,14 @@ class ReorientRobotState(robot_states.State):
         )
 
         if deg_turned_right > 45 and deg_turned_right < 135:
-            self._robot.get_logger().info("Took RIGHT path")
+            self._robot.append_intersection_turn(
+                helper_classes.IntersectionDirection.RIGHT
+            )
             return ScanIntersectionEndState(self._robot)
         elif deg_turned_right > 135 and deg_turned_right < 225:
-            self._robot.get_logger().info("Took BACK path")
+            self._robot.append_intersection_turn(
+                helper_classes.IntersectionDirection.BACK
+            )
             return ScanIntersectionEndState(self._robot)
         elif deg_turned_right > 225:
             self._robot.get_logger().info(

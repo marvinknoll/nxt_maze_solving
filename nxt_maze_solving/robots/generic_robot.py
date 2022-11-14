@@ -17,11 +17,14 @@ class Robot(ABC, rclpy.node.Node):
         super().__init__(name)
 
         self.maze_propeties = maze_properties
-
         self.straight_forward_velocity: float = 0.0565
 
         self._scan_state = None
         self._realign_state = None
+
+        self.intersection_directions: List[
+            helper_classes.IntersectionDirection
+        ] = []
 
         self._last_odom_msg: Union[nav_msgs.msg.Odometry, None] = None
         self._last_joint_state_msg: Union[
@@ -140,3 +143,15 @@ class Robot(ABC, rclpy.node.Node):
 
     def turn_left(self, angular_velocity: float):
         self._turn(angular_velocity)
+
+    def append_intersection_turn(
+        self, direction: helper_classes.IntersectionDirection
+    ):
+        self.intersection_directions.append(direction)
+        directions_string = [
+            direction.value for direction in self.intersection_directions
+        ]
+        self.get_logger().info(
+            "Directions taken at the last intersections: %s"
+            % directions_string
+        )

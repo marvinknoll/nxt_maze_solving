@@ -13,6 +13,20 @@ class Color(enum.IntEnum):
     WHITE = 6
 
 
+@enum.unique
+class TurningDirection(enum.IntEnum):
+    LEFT = 1
+    RIGHT = 2
+
+
+@enum.unique
+class IntersectionDirection(str, enum.Enum):
+    LEFT = "L"
+    STRAIGHT = "S"
+    RIGHT = "R"
+    BACK = "B"
+
+
 class MazeProperties:
     def __init__(
         self,
@@ -27,9 +41,3 @@ class MazeProperties:
         self.start_color = start_color
         self.intersection_color = intersection_color
         self.end_color = end_color
-
-
-@enum.unique
-class TurningDirection(enum.IntEnum):
-    LEFT = 1
-    RIGHT = 2
