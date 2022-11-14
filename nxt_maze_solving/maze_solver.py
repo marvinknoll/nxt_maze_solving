@@ -53,37 +53,31 @@ class MazeSolver(rclpy.node.Node):
         self.colors[1] = helper_functions.color_rgba_to_color(color_msg)
 
     def solve_maze(self):
+        if not self._robot.on_end(self.colors):
+            self._end_color_measurements_cnt = 0
+
         if (
             self._robot.on_intersection(self.colors)
             or self._robot.scanning_intersection()
         ):
             # self.get_logger().info("on_intersection")
             self._robot.scan_intersection(self.colors)
-            return
-
-        if self._robot.on_end(self.colors):
+        elif self._robot.off_line(self.colors) or self._robot.realigning():
+            # self.get_logger().info("off_line")
+            self._robot.realign(self.colors)
+        elif self._robot.on_line(self.colors):
+            # self.get_logger().info("on_line")
+            self._robot.drive_straight(self._robot.straight_forward_velocity)
+        elif self._robot.on_start(self.colors):
+            # self.get_logger().info("on_start")
+            self._robot.drive_straight(self._robot.straight_forward_velocity)
+        elif self._robot.on_end(self.colors):
             # self.get_logger().info("on_end")
             self._end_color_measurements_cnt += 1
-            if self._end_color_measurements_cnt > 3:
+            if self._end_color_measurements_cnt > 6:
                 self._robot.stop_driving_motors()
                 self._main_timer.cancel()
                 rclpy.shutdown()
-
-        else:
-            self._end_color_measurements_cnt = 0
-
-        if self._robot.off_line(self.colors) or self._robot.realigning():
-            # self.get_logger().info("off_line")
-            self._robot.realign(self.colors)
-
-        if self._robot.on_line(self.colors):
-            # self.get_logger().info("on_line")
-            self._robot.drive_straight(self._robot.straight_forward_velocity)
-            self._robot.reset_realign()  # TODO remove once refactored one_fixed_sensor to state machine
-
-        if self._robot.on_start(self.colors):
-            # self.get_logger().info("on_start")
-            self._robot.drive_straight(self._robot.straight_forward_velocity)
 
     def destroy_node(self):
         """Destroy the node."""

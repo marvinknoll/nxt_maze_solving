@@ -85,7 +85,7 @@ def color_rgba_to_color(
 def degrees_turned_from(
     initial_odom: nav_msgs.msg.Odometry,
     current_odom: nav_msgs.msg.Odometry,
-    turning_left: bool,
+    turning_direction: helper_classes.TurningDirection,
 ):
     initial_yaw_z = orientation_deg_from_odom(initial_odom)
     current_yaw_z = orientation_deg_from_odom(current_odom)
@@ -97,7 +97,7 @@ def degrees_turned_from(
         current_yaw_z if current_yaw_z > 0 else 360 + current_yaw_z
     )
 
-    if turning_left:
+    if turning_direction == helper_classes.TurningDirection.LEFT:
         if initial_yaw_z_norm <= current_yaw_z_norm:
             return current_yaw_z_norm - initial_yaw_z_norm
         else:
@@ -107,4 +107,3 @@ def degrees_turned_from(
             return initial_yaw_z_norm - current_yaw_z_norm
         else:
             return 360 - current_yaw_z_norm + initial_yaw_z_norm
-

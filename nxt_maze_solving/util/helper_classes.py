@@ -29,16 +29,7 @@ class MazeProperties:
         self.end_color = end_color
 
 
-class State:
-    def __init__(self):
-        print("Initialized following state:", str(self))
-
-    def on_event(self, color_values: List[helper_classes.Color]):
-        pass
-
-    def __repr__(self):
-
-        return self.__str__()
-
-    def __str__(self):
-        return self.__class__.__name__
+@enum.unique
+class TurningDirection(enum.IntEnum):
+    LEFT = 1
+    RIGHT = 2

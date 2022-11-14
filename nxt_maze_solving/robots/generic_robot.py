@@ -48,7 +48,6 @@ class Robot(ABC, rclpy.node.Node):
             sensor_msgs.msg.JointState, "joint_states", self._cb_js, 10
         )
 
-
     @abstractmethod
     def on_end(self, color_values: List[helper_classes.Color]) -> bool:
         pass
@@ -77,10 +76,6 @@ class Robot(ABC, rclpy.node.Node):
 
     @abstractmethod
     def realign(self, color_values: List[helper_classes.Color]):
-        pass
-
-    @abstractmethod
-    def reset_realign(self):
         pass
 
     def _cb_odom(self, msg: nav_msgs.msg.Odometry):

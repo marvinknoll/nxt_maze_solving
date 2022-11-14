@@ -1,10 +1,6 @@
-import rclpy.action
-
-import nxt_msgs2
-import nav_msgs
-
 import nxt_maze_solving.util.helper_functions as helper_functions
 import nxt_maze_solving.util.helper_classes as helper_classes
+import nxt_maze_solving.util.robot_states as robot_states
 import nxt_maze_solving.robots.generic_robot as generic_robot
 
 import math
@@ -27,166 +23,106 @@ class OneFixedSensorRobot(generic_robot.Robot):
         self._scan_intersection_centre_odom = None
         self._scan_turned_left = False
 
-        self._last_odom_msg: Union[nav_msgs.msg.Odometry, None] = None
-        self.create_subscription(
-            nav_msgs.msg.Odometry, "odom", self._cb_odom, 10
-        )
-
     def on_end(self, color_values: List[helper_classes.Color]) -> bool:
         return color_values[1] == self.maze_propeties.end_color
 
     def on_intersection(
         self, color_values: List[helper_classes.Color]
     ) -> bool:
-        return (
-            color_values[1] == self.maze_propeties.intersection_color
-            or self.scanning_intersection
-        )
+        return color_values[1] == self.maze_propeties.intersection_color
 
     def off_line(self, color_values: List[helper_classes.Color]) -> bool:
         return (
             color_values[1] == self.maze_propeties.background_color
-            and not self.scanning_intersection
+            and not self.scanning_intersection()
         )
 
     def on_line(self, color_values: List[helper_classes.Color]) -> bool:
-        return (
-            color_values[1] == self.maze_propeties.line_color
-            and not self.scanning_intersection
-        )
+        if (
+            self.maze_propeties.line_color == helper_classes.Color.BLACK
+            and self.maze_propeties.background_color
+            == helper_classes.Color.WHITE
+        ):
+            # If the sensor is at the border of the black line it sometimes
+            # reads BLUE instead of BLACK
+            return (
+                color_values[1] == self.maze_propeties.line_color
+                or color_values[1] == helper_classes.Color.BLUE
+            )
+        else:
+            return color_values[1] == self.maze_propeties.line_color
 
     def on_start(self, color_values: List[helper_classes.Color]) -> bool:
         return color_values[1] == self.maze_propeties.start_color
 
     def scan_intersection(self, color_values: List[helper_classes.Color]):
-        if self._scan_start_position is None:
-            self._scan_start_position = self._last_odom_msg.pose.pose.position
+        if self._scan_state is None:
 
-        current_position = self._last_odom_msg.pose.pose.position
-        delta_x = abs(current_position.x - self._scan_start_position.x)
-        delta_y = abs(current_position.y - self._scan_start_position.y)
-        dist = math.sqrt(math.pow(delta_x, 2) + math.pow(delta_y, 2))
+            self._scan_state = robot_states.RepositionForScanState(
+                self,
+                0.1,
+                0.0456,
+                robot_states.TurnRobotState(
+                    self,
+                    ScanToRight(self),
+                    135,
+                    helper_classes.TurningDirection.LEFT,
+                ),
+            )
 
-        if dist < 0.11:  # reposition on intersection centre
-            self.drive_straight(self._scan_reposition_velocity)
-            return
-
-        if self._scan_intersection_centre_odom is None:
-            self._scan_intersection_centre_odom = self._last_odom_msg
-
-        initial_yaw_z = helper_functions.orientation_deg_from_odom(
-            self._scan_intersection_centre_odom
-        )
-        current_yaw_z = helper_functions.orientation_deg_from_odom(
-            self._last_odom_msg
-        )
-
-        if not self._scan_turned_left:
-            # Turn left to initial 360° scan position from various orientations
-            if initial_yaw_z > 45 and initial_yaw_z < 135:
-                # Faced WEST at start
-                if (current_yaw_z > 45 and current_yaw_z < 180) or (
-                    current_yaw_z < -135 and current_yaw_z > -180
-                ):
-                    self.turn_left(self._scan_turning_velocity)
-                else:
-                    self._scan_turned_left = True
-            elif initial_yaw_z < 45 and initial_yaw_z > -45:
-                # Faced NORTH at start
-                if current_yaw_z < 135:
-                    self.turn_left(self._scan_turning_velocity)
-                else:
-                    self._scan_turned_left = True
-            elif initial_yaw_z < -45 and initial_yaw_z > -135:
-                # Faced EAST at start
-                if current_yaw_z < 45:
-                    self.turn_left(self._scan_turning_velocity)
-                else:
-                    self._scan_turned_left = True
-            elif (initial_yaw_z < -135 and delta_y > -180) or (
-                initial_yaw_z > 135 and initial_yaw_z < 180
-            ):
-                # Faced SOUTH at start
-                if (current_yaw_z > 135 and current_yaw_z > 180) or (
-                    current_yaw_z < -45 and current_yaw_z > -180
-                ):
-                    self.turn_left(self._scan_turning_velocity)
-                else:
-                    self._scan_turned_left = True
-        else:
-            # Turn right and scan
-            self.turn_right(self._scan_turning_velocity)
-
-        if not self._scan_turned_left:
-            return
-
-        if color_values[1] == self.maze_propeties.line_color:
-            if current_yaw_z > 45 and current_yaw_z < 135:  # Facing WEST
-                self.get_logger().info("Took WEST Path")
-            elif current_yaw_z < 45 and current_yaw_z > -45:  # Facing NORTH
-                self.get_logger().info("Took NORTH Path")
-            elif current_yaw_z < -45 and current_yaw_z > -135:  # Facing EAST
-                self.get_logger().info("Took EAST Path")
-            elif (current_yaw_z < -135 and delta_y > -180) or (  # Facing SOUTH
-                current_yaw_z > 135 and current_yaw_z < 180
-            ):
-                self.get_logger().info("Took SOUTH Path")
-
-            self.reset_intersection_scan()
-
-    def reset_intersection_scan(self):
-        self.scanning_intersection = False
-        self._scan_start_position = None
-        self._scan_intersection_centre_odom = None
-        self._scan_turned_left = False
+        self._scan_state = self._scan_state.on_event(color_values)
 
     def realign(self, color_values: List[helper_classes.Color]):
-        if self._last_odom_msg is None:
-            return
+        if self._realign_state is None:
+            self._realign_state = robot_states.RealignState(self)
 
-        if self._realign_start_yaw_z is None:
-            self.stop_driving_motors()
-            start_orientation = self._last_odom_msg.pose.pose.orientation
-            _, _, _yaw_z = helper_functions.euler_from_quaternion(
-                start_orientation.x,
-                start_orientation.y,
-                start_orientation.z,
-                start_orientation.w,
-            )
-            self._realign_start_yaw_z = math.degrees(_yaw_z)
-        else:
-            current_orientation = self._last_odom_msg.pose.pose.orientation
+        self._realign_state = self._realign_state.on_event(color_values)
 
-            _, _, current_yaw_z = helper_functions.euler_from_quaternion(
-                current_orientation.x,
-                current_orientation.y,
-                current_orientation.z,
-                current_orientation.w,
-            )
 
-            delt_yaw_z = (
-                math.degrees(current_yaw_z) - self._realign_start_yaw_z
-            )
+# Sensor configuration specific states
+class ScanToRight(robot_states.State):
+    def __init__(self, robot: OneFixedSensorRobot, turn_velocity: float = 0.4):
+        self._robot = robot
+        self._turn_velocity = turn_velocity
+        self._initial_odom = None
+        self._line_found = False
 
-            current_turning_goal = self._realign_positions[self._realign_idx]
-
-            if current_turning_goal > 0 and delt_yaw_z < current_turning_goal:
-                self.turn_left(self._realign_velocity)
-            elif (
-                current_turning_goal < 0 and delt_yaw_z > current_turning_goal
-            ):
-                self.turn_right(self._realign_velocity)
+    def on_event(self, color_values: List[helper_classes.Color]):
+        if self._initial_odom is None:
+            if self._robot._last_odom_msg is not None:
+                self._initial_odom = self._robot._last_odom_msg
             else:
-                if self._realign_idx < len(self._realign_positions) - 1:
-                    self.stop_driving_motors()
-                    self._realign_idx += 1
+                return self
+
+        if (
+            color_values[1] != self._robot.maze_propeties.line_color
+            and not self._line_found
+        ):
+            self._robot.turn_right(self._turn_velocity)
+            return self
+        else:
+            self._robot.stop_driving_motors()
+
+            if not self._line_found:
+                self._line_found = True
+
+                current_odom = self._robot._last_odom_msg
+                deg_turned_right = helper_functions.degrees_turned_from(
+                    self._initial_odom,
+                    current_odom,
+                    helper_classes.TurningDirection.RIGHT,
+                )
+
+                if deg_turned_right < 90:
+                    self._robot.get_logger().info("Took LEFT path")
+                elif deg_turned_right > 90 and deg_turned_right < 180:
+                    self._robot.get_logger().info("Took STRAIGHT path")
+                elif deg_turned_right > 180 and deg_turned_right < 270:
+                    self._robot.get_logger().info("Took RIGHT path")
                 else:
-                    self.get_logger().info("Realignment failed")
-                    self.stop_driving_motors()
+                    self._robot.get_logger().info("Took BACK path")
 
-    def reset_realign(self):
-        self._realign_idx = 0
-        self._realign_start_yaw_z = None
-
-    def _cb_odom(self, msg: nav_msgs.msg.Odometry):
-        self._last_odom_msg = msg
+            if not self._robot.driving_motors_still():
+                return self
+            else:
+                return None
