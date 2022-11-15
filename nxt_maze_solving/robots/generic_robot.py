@@ -10,6 +10,7 @@ import nav_msgs.msg
 import sensor_msgs.msg
 
 from typing import List, Union
+import copy
 
 
 class Robot(ABC, rclpy.node.Node):
@@ -155,3 +156,58 @@ class Robot(ABC, rclpy.node.Node):
             "Directions taken at the last intersections: %s"
             % directions_string
         )
+
+    def get_total_path(self) -> List[helper_classes.IntersectionDirection]:
+        return copy.deepcopy(self.intersection_directions)
+
+    def get_shortest_path(self) -> List[helper_classes.IntersectionDirection]:
+        directions = copy.deepcopy(self.intersection_directions)
+
+        while helper_classes.IntersectionDirection.BACK in directions:
+            b_idx = directions.index(helper_classes.IntersectionDirection.BACK)
+            string_to_sub = directions[b_idx - 1 : b_idx + 2]
+            substitution = ""
+            if string_to_sub == [
+                helper_classes.IntersectionDirection.LEFT,
+                helper_classes.IntersectionDirection.BACK,
+                helper_classes.IntersectionDirection.RIGHT,
+            ]:
+                substitution = helper_classes.IntersectionDirection.BACK
+            elif string_to_sub == [
+                helper_classes.IntersectionDirection.LEFT,
+                helper_classes.IntersectionDirection.BACK,
+                helper_classes.IntersectionDirection.STRAIGHT,
+            ]:
+                substitution = helper_classes.IntersectionDirection.RIGHT
+            elif string_to_sub == [
+                helper_classes.IntersectionDirection.RIGHT,
+                helper_classes.IntersectionDirection.BACK,
+                helper_classes.IntersectionDirection.LEFT,
+            ]:
+                substitution = helper_classes.IntersectionDirection.BACK
+            elif string_to_sub == [
+                helper_classes.IntersectionDirection.STRAIGHT,
+                helper_classes.IntersectionDirection.BACK,
+                helper_classes.IntersectionDirection.LEFT,
+            ]:
+                substitution = helper_classes.IntersectionDirection.RIGHT
+            elif string_to_sub == [
+                helper_classes.IntersectionDirection.STRAIGHT,
+                helper_classes.IntersectionDirection.BACK,
+                helper_classes.IntersectionDirection.STRAIGHT,
+            ]:
+                substitution = helper_classes.IntersectionDirection.BACK
+            elif string_to_sub == [
+                helper_classes.IntersectionDirection.LEFT,
+                helper_classes.IntersectionDirection.BACK,
+                helper_classes.IntersectionDirection.LEFT,
+            ]:
+                substitution = helper_classes.IntersectionDirection.STRAIGHT
+
+            directions = (
+                directions[: b_idx - 1]
+                + [substitution]
+                + directions[b_idx + 2 :]
+            )
+
+        return directions

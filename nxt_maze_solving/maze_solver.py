@@ -52,6 +52,16 @@ class MazeSolver(rclpy.node.Node):
     def _cb_c_color_read(self, color_msg: nxt_msgs2.msg.Color):
         self.colors[1] = helper_functions.color_rgba_to_color(color_msg)
 
+    def _print_shortest_path(self):
+        shortest_path = self._robot.get_shortest_path()
+        directions_string = [direction.value for direction in shortest_path]
+        self.get_logger().info("Shortest path: %s" % directions_string)
+
+    def _print_total_path(self):
+        total_path = self._robot.get_total_path()
+        directions_string = [direction.value for direction in total_path]
+        self.get_logger().info("Total path: %s" % directions_string)
+
     def solve_maze(self):
         if not self._robot.on_end(self.colors):
             self._end_color_measurements_cnt = 0
@@ -76,6 +86,10 @@ class MazeSolver(rclpy.node.Node):
             self._end_color_measurements_cnt += 1
             if self._end_color_measurements_cnt > 6:
                 self._robot.stop_driving_motors()
+
+                self._print_total_path()
+                self._print_shortest_path()
+
                 self._main_timer.cancel()
                 rclpy.shutdown()
 
