@@ -11,6 +11,7 @@ import sensor_msgs.msg
 
 from typing import List, Union
 import copy
+import time
 
 
 class Robot(ABC, rclpy.node.Node):
@@ -51,6 +52,18 @@ class Robot(ABC, rclpy.node.Node):
         self.create_subscription(
             sensor_msgs.msg.JointState, "joint_states", self._cb_js, 10
         )
+
+        # GetBatteryLevel client
+        self._get_battery_level_client = self.create_client(
+            nxt_msgs2.srv.GetBatteryLevel, "/brick/get_battery_level"
+        )
+        while not self._get_battery_level_client.wait_for_service(
+            timeout_sec=1.0
+        ):
+            self.get_logger().info(
+                "brick/get_battery_level service not available,"
+                " waiting again..."
+            )
 
     @abstractmethod
     def on_end(self, color_values: List[helper_classes.Color]) -> bool:
@@ -211,3 +224,92 @@ class Robot(ABC, rclpy.node.Node):
             )
 
         return directions
+
+    def send_start_benchmark_message(self, num_battery_requests: int = 20):
+        measurements = []
+        battery_level_req = nxt_msgs2.srv.GetBatteryLevel.Request()
+
+        for i in range(num_battery_requests):
+            future = self._get_battery_level_client.call_async(
+                battery_level_req
+            )
+            future.add_done_callback(
+                lambda future: measurements.append(
+                    future.result().battery_voltage
+                )
+            )
+
+            time.sleep(0.5)
+
+            if i == num_battery_requests - 1:
+                future.add_done_callback(
+                    lambda future: self._send_benchmark_message(
+                        int(sum(measurements) / len(measurements)), "start"
+                    )
+                )
+
+    def send_end_benchmark_message(self, num_battery_requests: int = 20):
+        measurements = []
+        battery_level_req = nxt_msgs2.srv.GetBatteryLevel.Request()
+
+        for i in range(num_battery_requests):
+            future = self._get_battery_level_client.call_async(
+                battery_level_req
+            )
+            future.add_done_callback(
+                lambda future: measurements.append(
+                    future.result().battery_voltage
+                )
+            )
+
+            time.sleep(0.5)
+
+            if i == num_battery_requests - 1:
+                future.add_done_callback(
+                    lambda future: self._send_benchmark_message(
+                        int(sum(measurements) / len(measurements)), "end"
+                    )
+                )
+
+    def send_start_realign_benchmark_message(self):
+        battery_level_req = nxt_msgs2.srv.GetBatteryLevel.Request()
+        future = self._get_battery_level_client.call_async(battery_level_req)
+        future.add_done_callback(
+            lambda future: self._send_benchmark_message(
+                future.result().battery_voltage, "start_realign"
+            )
+        )
+
+    def send_end_realign_benchmark_message(self):
+        battery_level_req = nxt_msgs2.srv.GetBatteryLevel.Request()
+        future = self._get_battery_level_client.call_async(battery_level_req)
+        future.add_done_callback(
+            lambda future: self._send_benchmark_message(
+                future.result().battery_voltage, "end_realign"
+            )
+        )
+
+    def send_start_intersection_scan_benchmark_message(self):
+        battery_level_req = nxt_msgs2.srv.GetBatteryLevel.Request()
+        future = self._get_battery_level_client.call_async(battery_level_req)
+        future.add_done_callback(
+            lambda future: self._send_benchmark_message(
+                future.result().battery_voltage, "start_intersection_scan"
+            )
+        )
+
+    def send_end_intersection_scan_benchmark_message(self):
+        battery_level_req = nxt_msgs2.srv.GetBatteryLevel.Request()
+        future = self._get_battery_level_client.call_async(battery_level_req)
+        future.add_done_callback(
+            lambda future: self._send_benchmark_message(
+                future.result().battery_voltage, "end_intersection_scan"
+            )
+        )
+
+    def _send_benchmark_message(self, battery_voltage, action):
+        msg = nxt_msgs2.msg.RobotAction()
+        msg.header.stamp = self.get_clock().now().to_msg()
+        msg.action = action
+        msg.battery_voltage = battery_voltage
+        self._robot_action_pub.publish(msg)

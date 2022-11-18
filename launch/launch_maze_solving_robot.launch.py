@@ -37,10 +37,19 @@ def generate_launch_description():
         on_exit=Shutdown(),
     )
 
+    robot_benchmarking_node = Node(
+        package="nxt_maze_solving",
+        executable="robot_benchmarking",
+        output="screen",
+        arguments=[LaunchConfiguration("robot_sensor_configuration")],
+        on_exit=Shutdown(),
+    )
+
     return LaunchDescription(
         [
             nxt_ros2,
             maze_solver_node,
+            robot_benchmarking_node,
             robot_configuration,
         ]
     )

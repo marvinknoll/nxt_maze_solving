@@ -37,6 +37,7 @@ class RealignState(State):
         self._realign_base_velocity = realign_base_velocity
 
         self._robot.stop_driving_motors()
+        self._robot.send_start_realign_benchmark_message()
 
         self._initial_odom = None
         if self._robot._last_odom_msg is not None:
@@ -46,6 +47,7 @@ class RealignState(State):
         if color_values[1] != self._robot.maze_propeties.background_color:
             self._robot.stop_driving_motors()
             if self._robot.driving_motors_still():
+                self._robot.send_end_realign_benchmark_message()
                 return None
             else:
                 # Wait for motors to be still

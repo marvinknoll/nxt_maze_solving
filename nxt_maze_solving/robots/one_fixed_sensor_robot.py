@@ -57,6 +57,11 @@ class OneFixedSensorRobot(generic_robot.Robot):
 
     def scan_intersection(self, color_values: List[helper_classes.Color]):
         if self._scan_state is None:
+            if self._realign_state is not None:
+                self.send_end_realign_benchmark_message()
+                self._realign_state = None
+
+            self.send_start_intersection_scan_benchmark_message()
 
             self._scan_state = robot_states.RepositionForScanState(
                 self,
@@ -133,4 +138,5 @@ class ScanToRight(robot_states.State):
             if not self._robot.driving_motors_still():
                 return self
             else:
+                self._robot.send_end_intersection_scan_benchmark_message()
                 return None

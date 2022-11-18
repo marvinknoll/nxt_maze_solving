@@ -3,6 +3,7 @@ import nav_msgs.msg
 
 import nxt_maze_solving.util.helper_classes as helper_classes
 
+import rclpy.time
 import math
 
 
@@ -107,3 +108,18 @@ def degrees_turned_from(
             return initial_yaw_z_norm - current_yaw_z_norm
         else:
             return 360 - current_yaw_z_norm + initial_yaw_z_norm
+
+
+def add_durations(
+    duration1: rclpy.time.Duration, duration2: rclpy.time.Duration
+) -> rclpy.time.Duration:
+    total_nanoseconds = duration1.nanoseconds + duration2.nanoseconds
+    if total_nanoseconds >= 2**63:
+        raise Exception("Total nanoseconds value is too large")
+
+    return rclpy.duration.Duration(nanoseconds=total_nanoseconds)
+
+
+def duration_str(duration: rclpy.time.Duration):
+    sec = duration.sec + (duration.nanosec * 0.000000001)
+    return str(sec) + "s"

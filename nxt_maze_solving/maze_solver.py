@@ -18,6 +18,7 @@ import nxt_maze_solving.robots.one_fixed_sensor_robot as one_fixed_sensor_robot
 import nxt_maze_solving.robots.one_turning_sensor_robot as one_turning_sensor_robot
 
 import sys
+import time
 
 from typing import List
 
@@ -47,6 +48,8 @@ class MazeSolver(rclpy.node.Node):
             nxt_msgs2.msg.JointEffort, "joint_effort", 10
         )
 
+        self._robot.send_start_benchmark_message()
+
         self._main_timer = self.create_timer(0.1, self.solve_maze)
 
     def _cb_c_color_read(self, color_msg: nxt_msgs2.msg.Color):
@@ -75,23 +78,26 @@ class MazeSolver(rclpy.node.Node):
         elif self._robot.off_line(self.colors) or self._robot.realigning():
             # self.get_logger().info("off_line")
             self._robot.realign(self.colors)
+        elif self._robot.on_end(self.colors):
+            # self.get_logger().info("on_end")
+            self._robot.stop_driving_motors()
+
+            if self._robot.driving_motors_still():
+                self._main_timer.cancel()
+
+                self._robot.send_end_benchmark_message()
+
+                self._print_total_path()
+                self._print_shortest_path()
+
+                time.sleep(3)
+                rclpy.shutdown()
         elif self._robot.on_line(self.colors):
             # self.get_logger().info("on_line")
             self._robot.drive_straight(self._robot.straight_forward_velocity)
         elif self._robot.on_start(self.colors):
             # self.get_logger().info("on_start")
             self._robot.drive_straight(self._robot.straight_forward_velocity)
-        elif self._robot.on_end(self.colors):
-            # self.get_logger().info("on_end")
-            self._end_color_measurements_cnt += 1
-            if self._end_color_measurements_cnt > 6:
-                self._robot.stop_driving_motors()
-
-                self._print_total_path()
-                self._print_shortest_path()
-
-                self._main_timer.cancel()
-                rclpy.shutdown()
 
     def destroy_node(self):
         """Destroy the node."""
@@ -107,9 +113,9 @@ def main(args=None):
         maze_properties = helper_classes.MazeProperties(
             line_color=helper_classes.Color.BLACK,
             background_color=helper_classes.Color.WHITE,
-            start_color=helper_classes.Color.GREEN,
+            start_color=helper_classes.Color.YELLOW,
             intersection_color=helper_classes.Color.RED,
-            end_color=helper_classes.Color.YELLOW,
+            end_color=helper_classes.Color.GREEN,
         )
 
         robot_configuration = sys.argv[1]

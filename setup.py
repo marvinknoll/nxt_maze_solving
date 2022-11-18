@@ -36,6 +36,7 @@ setup(
     entry_points={
         "console_scripts": [
             "maze_solver = nxt_maze_solving.maze_solver:main",
+            "robot_benchmarking = nxt_maze_solving.robot_benchmarking:main",
         ],
     },
 )
