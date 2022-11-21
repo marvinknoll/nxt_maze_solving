@@ -1,9 +1,6 @@
 /nxt_ros_setup:
   ros__parameters:
     devices:
-      1:
-        sensor_type: touch
-        sensor_name: touch_sensor
       3:
         sensor_type: color
         sensor_name: color_sensor
