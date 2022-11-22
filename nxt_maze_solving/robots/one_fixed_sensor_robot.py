@@ -9,8 +9,8 @@ from typing import List, Union
 
 
 class OneFixedSensorRobot(generic_robot.Robot):
-    def __init__(self, name, maze_properties):
-        super().__init__(name, maze_properties)
+    def __init__(self, maze_properties):
+        super().__init__("one_fixed_sensor_robot", maze_properties)
 
         self._realign_positions = [20, -40, 60, -60, -5]
         self._realign_velocity = 0.29

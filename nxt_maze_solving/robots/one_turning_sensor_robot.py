@@ -12,7 +12,7 @@ from typing import List
 
 class OneTurningSensorRobot(generic_robot.Robot):
     def __init__(self, maze_properties):
-        super().__init__("one_turning_sensor", maze_properties)
+        super().__init__("one_turning_sensor_robot", maze_properties)
 
         self._line_angle = None
 

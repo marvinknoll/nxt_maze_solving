@@ -121,9 +121,7 @@ def main(args=None):
         robot_configuration = sys.argv[1]
         robot: generic_robot.Robot = None
         if robot_configuration == "one_fixed":
-            robot = one_fixed_sensor_robot.OneFixedSensorRobot(
-                "one_fix_sensor", maze_properties
-            )
+            robot = one_fixed_sensor_robot.OneFixedSensorRobot(maze_properties)
         elif robot_configuration == "one_turning":
             robot = one_turning_sensor_robot.OneTurningSensorRobot(
                 maze_properties
