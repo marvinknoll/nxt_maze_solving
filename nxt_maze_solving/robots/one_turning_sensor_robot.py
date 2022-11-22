@@ -139,12 +139,12 @@ class ScanState(robot_states.State):
             self._robot._last_joint_state_msg.position[sensor_idx]
         )
 
-        if sensor_pos > -20:
+        if sensor_pos > -45:
             self._robot._turn_sensor_motor(self._effort)
             if (
                 color_values[1] == self._robot.maze_propeties.line_color
-                and self._robot._line_angle is None
-            ):
+                or color_values[1] == helper_classes.Color.BLUE
+            ) and self._robot._line_angle is None:
                 self._robot._line_angle = sensor_pos
             return self
         else:
