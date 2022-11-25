@@ -244,7 +244,7 @@ class Robot(ABC, rclpy.node.Node):
             if i == num_battery_requests - 1:
                 future.add_done_callback(
                     lambda future: self._send_benchmark_message(
-                        int(sum(measurements) / len(measurements)), "start"
+                        "start", int(sum(measurements) / len(measurements))
                     )
                 )
 
@@ -267,49 +267,26 @@ class Robot(ABC, rclpy.node.Node):
             if i == num_battery_requests - 1:
                 future.add_done_callback(
                     lambda future: self._send_benchmark_message(
-                        int(sum(measurements) / len(measurements)), "end"
+                        "end", int(sum(measurements) / len(measurements))
                     )
                 )
 
     def send_start_realign_benchmark_message(self):
-        battery_level_req = nxt_msgs2.srv.GetBatteryLevel.Request()
-        future = self._get_battery_level_client.call_async(battery_level_req)
-        future.add_done_callback(
-            lambda future: self._send_benchmark_message(
-                future.result().battery_voltage, "start_realign"
-            )
-        )
+        self._send_benchmark_message("start_realign")
 
     def send_end_realign_benchmark_message(self):
-        battery_level_req = nxt_msgs2.srv.GetBatteryLevel.Request()
-        future = self._get_battery_level_client.call_async(battery_level_req)
-        future.add_done_callback(
-            lambda future: self._send_benchmark_message(
-                future.result().battery_voltage, "end_realign"
-            )
-        )
+        self._send_benchmark_message("end_realign")
 
     def send_start_intersection_scan_benchmark_message(self):
-        battery_level_req = nxt_msgs2.srv.GetBatteryLevel.Request()
-        future = self._get_battery_level_client.call_async(battery_level_req)
-        future.add_done_callback(
-            lambda future: self._send_benchmark_message(
-                future.result().battery_voltage, "start_intersection_scan"
-            )
-        )
+        self._send_benchmark_message("start_intersection_scan")
 
     def send_end_intersection_scan_benchmark_message(self):
-        battery_level_req = nxt_msgs2.srv.GetBatteryLevel.Request()
-        future = self._get_battery_level_client.call_async(battery_level_req)
-        future.add_done_callback(
-            lambda future: self._send_benchmark_message(
-                future.result().battery_voltage, "end_intersection_scan"
-            )
-        )
+        self._send_benchmark_message("end_intersection_scan")
 
-    def _send_benchmark_message(self, battery_voltage, action):
+    def _send_benchmark_message(self, action, battery_voltage=None):
         msg = nxt_msgs2.msg.RobotAction()
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.action = action
-        msg.battery_voltage = battery_voltage
+        if battery_voltage is not None:
+            msg.battery_voltage = battery_voltage
         self._robot_action_pub.publish(msg)

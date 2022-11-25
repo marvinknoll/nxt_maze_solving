@@ -30,15 +30,11 @@ class RobotAction:
         self,
         action_type: RobotActionType,
         start_time_stamp,
-        start_voltage: int,
     ):
         self.action_type = action_type
 
         self.start_time_stamp: rclpy.time.Time = start_time_stamp
-        self.start_voltage: int = start_voltage
-
         self.end_time_stamp: rclpy.time.Time = None
-        self.end_voltage: int = None
 
     def __repr__(self):
         s_dt = datetime.fromtimestamp(
@@ -57,26 +53,21 @@ class RobotAction:
         return (
             f"(start_time: {s_dt.strftime('%Y-%m-%d %H:%M:%S')}, end_time:"
             f" {e_dt.strftime('%Y-%m-%d %H:%M:%S')}, duration:"
-            f" {duration_seconds}s, start_voltage: {self.start_voltage},"
-            f" end_voltage: {self.end_voltage})"
+            f" {duration_seconds}s)"
         )
 
 
 class RealignmentAction(RobotAction):
-    def __init__(self, start_time_stamp, start_voltage: int):
-        super().__init__(
-            RobotActionType.REALIGN, start_time_stamp, start_voltage
-        )
+    def __init__(self, start_time_stamp):
+        super().__init__(RobotActionType.REALIGN, start_time_stamp)
 
     def __repr__(self):
         return "RealignmentAction" + super().__repr__()
 
 
 class IntersectionScanAction(RobotAction):
-    def __init__(self, start_time_stamp, start_voltage: int):
-        super().__init__(
-            RobotActionType.INTERSECTION_SCAN, start_time_stamp, start_voltage
-        )
+    def __init__(self, start_time_stamp):
+        super().__init__(RobotActionType.INTERSECTION_SCAN, start_time_stamp)
 
     def __repr__(self):
         return "IntersectionScanAction" + super().__repr__()
@@ -122,20 +113,18 @@ class RobotBenchmarking(rclpy.node.Node):
             self.save_benchmarks_to_file()
         elif action == "start_realign":
             # self.get_logger().info("GOT START REALIGN BENCHMARK MSG")
-            realign_action = RealignmentAction(stamp, msg.battery_voltage)
+            realign_action = RealignmentAction(stamp)
             self._realignments.append(realign_action)
         elif action == "end_realign":
             # self.get_logger().info("GOT END REALIGN BENCHMARK MSG")
             self._realignments[-1].end_time_stamp = stamp
-            self._realignments[-1].end_voltage = msg.battery_voltage
         elif action == "start_intersection_scan":
             # self.get_logger().info("GOT START INTERSECTION BENCHMARK MSG")
-            scan_action = IntersectionScanAction(stamp, msg.battery_voltage)
+            scan_action = IntersectionScanAction(stamp)
             self._intersection_scans.append(scan_action)
         elif action == "end_intersection_scan":
             # self.get_logger().info("GOT END INTERSECTION BENCHMARK MSG")
             self._intersection_scans[-1].end_time_stamp = stamp
-            self._intersection_scans[-1].end_voltage = msg.battery_voltage
 
     def _get_total_duration(self) -> rclpy.time.Duration:
         return rclpy.time.Duration(
