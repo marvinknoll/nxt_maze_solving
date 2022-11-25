@@ -60,7 +60,7 @@ class OneTurningSensorRobot(generic_robot.Robot):
 
             self.send_start_intersection_scan_benchmark_message()
 
-            self._scan_state = robot_states.RepositionForScanState(
+            self._scan_state = robot_states.DriveForwardState(
                 self,
                 0.065,
                 0.0456,
@@ -152,43 +152,10 @@ class ScanState(robot_states.State):
                 self._robot,
                 0.0,
                 20.0,
-                RepositionRobotCentreState(self._robot, 0.05, 0.0456),
+                robot_states.DriveForwardState(
+                    self._robot, 0.05, 0.0456, ReorientRobotState(self._robot)
+                ),
             )
-
-
-class RepositionRobotCentreState(robot_states.State):
-    def __init__(
-        self,
-        robot: OneTurningSensorRobot,
-        goal_linear_distance: float,
-        linear_velocity: float,
-    ):
-        self._robot = robot
-        self._goal_linear_distance = goal_linear_distance
-        self._linear_velocity = linear_velocity
-        self._initial_pose = None
-        if self._robot._last_odom_msg is not None:
-            self._initial_pose = self._robot._last_odom_msg.pose.pose.position
-
-    def on_event(self, color_values: List[helper_classes.Color]):
-        if self._initial_pose is None:
-            if self._robot._last_odom_msg is not None:
-                self._initial_pose = (
-                    self._robot._last_odom_msg.pose.pose.position
-                )
-            else:
-                return self
-
-        current_position = self._robot._last_odom_msg.pose.pose.position
-        delta_x = abs(current_position.x - self._initial_pose.x)
-        delta_y = abs(current_position.y - self._initial_pose.y)
-        current_distance = math.sqrt(delta_x**2 + delta_y**2)
-        if current_distance < self._goal_linear_distance:
-            self._robot.drive_straight(self._linear_velocity)
-            return self
-        else:
-            self._robot.stop_driving_motors()
-            return ReorientRobotState(self._robot)
 
 
 class ReorientRobotState(robot_states.State):
@@ -253,6 +220,8 @@ class ReorientRobotState(robot_states.State):
                 "ERROR while reorienting on intersection"
             )
             return self
+
+        self._robot.get_logger().info("returning from non existing else")
 
 
 class ScanIntersectionEndState(robot_states.State):

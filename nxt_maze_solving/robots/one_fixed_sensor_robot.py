@@ -63,7 +63,7 @@ class OneFixedSensorRobot(generic_robot.Robot):
 
             self.send_start_intersection_scan_benchmark_message()
 
-            self._scan_state = robot_states.RepositionForScanState(
+            self._scan_state = robot_states.DriveForwardState(
                 self,
                 0.1,
                 0.0456,

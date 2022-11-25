@@ -112,7 +112,7 @@ class RealignState(State):
                 return None
 
 
-class RepositionForScanState(State):
+class DriveForwardState(State):
     def __init__(
         self,
         robot: generic_robot.Robot,
