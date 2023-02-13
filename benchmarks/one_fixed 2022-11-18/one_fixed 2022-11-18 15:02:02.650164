@@ -1,0 +1,58 @@
+Robot configuration: one_fixed
+
+Total run:
+	start_time: 2022-11-18 14:56:31
+	end_time: 2022-11-18 15:02:02
+	total_duration: 330.982750229s
+	start_voltage: 8049
+	end_voltage: 8018
+
+Intersections:
+	total_duration: Duration(nanoseconds=242883391135)
+	count: 17
+	individual intersection scans:
+		IntersectionScanAction(start_time: 2022-11-18 14:56:42, end_time: 2022-11-18 14:56:53, duration: 11.193173761s, start_voltage: 7879, end_voltage: 8087)
+		IntersectionScanAction(start_time: 2022-11-18 14:56:57, end_time: 2022-11-18 14:57:07, duration: 10.799800177s, start_voltage: 8017, end_voltage: 8059)
+		IntersectionScanAction(start_time: 2022-11-18 14:57:13, end_time: 2022-11-18 14:57:35, duration: 22.500123604s, start_voltage: 7865, end_voltage: 7921)
+		IntersectionScanAction(start_time: 2022-11-18 14:57:39, end_time: 2022-11-18 14:57:50, duration: 10.799853910s, start_voltage: 7851, end_voltage: 8004)
+		IntersectionScanAction(start_time: 2022-11-18 14:57:53, end_time: 2022-11-18 14:58:16, duration: 22.502215021s, start_voltage: 7934, end_voltage: 8004)
+		IntersectionScanAction(start_time: 2022-11-18 14:58:20, end_time: 2022-11-18 14:58:31, duration: 10.690331905s, start_voltage: 7921, end_voltage: 8073)
+		IntersectionScanAction(start_time: 2022-11-18 14:58:34, end_time: 2022-11-18 14:58:57, duration: 22.703549909s, start_voltage: 7921, end_voltage: 7893)
+		IntersectionScanAction(start_time: 2022-11-18 14:59:00, end_time: 2022-11-18 14:59:11, duration: 10.895511038s, start_voltage: 7976, end_voltage: 8073)
+		IntersectionScanAction(start_time: 2022-11-18 14:59:15, end_time: 2022-11-18 14:59:29, duration: 14.497190336s, start_voltage: 7921, end_voltage: 7907)
+		IntersectionScanAction(start_time: 2022-11-18 14:59:33, end_time: 2022-11-18 14:59:44, duration: 10.793146704s, start_voltage: 7824, end_voltage: 8017)
+		IntersectionScanAction(start_time: 2022-11-18 14:59:47, end_time: 2022-11-18 15:00:02, duration: 15.013206366s, start_voltage: 7921, end_voltage: 8004)
+		IntersectionScanAction(start_time: 2022-11-18 15:00:06, end_time: 2022-11-18 15:00:17, duration: 10.793941789s, start_voltage: 7962, end_voltage: 8004)
+		IntersectionScanAction(start_time: 2022-11-18 15:00:21, end_time: 2022-11-18 15:00:35, duration: 14.392094149s, start_voltage: 7893, end_voltage: 8031)
+		IntersectionScanAction(start_time: 2022-11-18 15:00:39, end_time: 2022-11-18 15:00:58, duration: 18.599709113s, start_voltage: 8004, end_voltage: 8059)
+		IntersectionScanAction(start_time: 2022-11-18 15:01:01, end_time: 2022-11-18 15:01:12, duration: 10.695521537s, start_voltage: 7879, end_voltage: 7921)
+		IntersectionScanAction(start_time: 2022-11-18 15:01:16, end_time: 2022-11-18 15:01:27, duration: 11.204550704s, start_voltage: 7962, end_voltage: 8059)
+		IntersectionScanAction(start_time: 2022-11-18 15:01:33, end_time: 2022-11-18 15:01:47, duration: 14.809471112s, start_voltage: 7851, end_voltage: 8045)
+
+Realignments:
+	total_duration: Duration(nanoseconds=30974766526)
+	count: 23
+	individual realignments:
+		RealignmentAction(start_time: 2022-11-18 14:56:32, end_time: 2022-11-18 14:56:33, duration: 0.908203436s, start_voltage: 8017, end_voltage: 7921)
+		RealignmentAction(start_time: 2022-11-18 14:56:34, end_time: 2022-11-18 14:56:39, duration: 5.296590305s, start_voltage: 7837, end_voltage: 8101)
+		RealignmentAction(start_time: 2022-11-18 14:56:53, end_time: 2022-11-18 14:56:54, duration: 1.300187012s, start_voltage: 8101, end_voltage: 8031)
+		RealignmentAction(start_time: 2022-11-18 14:57:07, end_time: 2022-11-18 14:57:09, duration: 1.196129858s, start_voltage: 8059, end_voltage: 7948)
+		RealignmentAction(start_time: 2022-11-18 14:57:10, end_time: 2022-11-18 14:57:11, duration: 1.196215945s, start_voltage: 7879, end_voltage: 7962)
+		RealignmentAction(start_time: 2022-11-18 14:57:35, end_time: 2022-11-18 14:57:37, duration: 1.406898095s, start_voltage: 8087, end_voltage: 7962)
+		RealignmentAction(start_time: 2022-11-18 14:57:50, end_time: 2022-11-18 14:57:51, duration: 1.099668744s, start_voltage: 7976, end_voltage: 8087)
+		RealignmentAction(start_time: 2022-11-18 14:58:16, end_time: 2022-11-18 14:58:17, duration: 1.102434722s, start_voltage: 8017, end_voltage: 7976)
+		RealignmentAction(start_time: 2022-11-18 14:58:18, end_time: 2022-11-18 14:58:19, duration: 0.896879544s, start_voltage: 8045, end_voltage: 7976)
+		RealignmentAction(start_time: 2022-11-18 14:58:20, end_time: 2022-11-18 14:58:20, duration: 0.100771923s, start_voltage: 7893, end_voltage: 7921)
+		RealignmentAction(start_time: 2022-11-18 14:58:31, end_time: 2022-11-18 14:58:32, duration: 1.306333567s, start_voltage: 8073, end_voltage: 7962)
+		RealignmentAction(start_time: 2022-11-18 14:58:57, end_time: 2022-11-18 14:58:58, duration: 1.300578809s, start_voltage: 7990, end_voltage: 8073)
+		RealignmentAction(start_time: 2022-11-18 14:59:12, end_time: 2022-11-18 14:59:13, duration: 0.997942115s, start_voltage: 8004, end_voltage: 8073)
+		RealignmentAction(start_time: 2022-11-18 14:59:29, end_time: 2022-11-18 14:59:31, duration: 1.203655296s, start_voltage: 8087, end_voltage: 8017)
+		RealignmentAction(start_time: 2022-11-18 14:59:44, end_time: 2022-11-18 14:59:45, duration: 0.993428944s, start_voltage: 7865, end_voltage: 7948)
+		RealignmentAction(start_time: 2022-11-18 15:00:02, end_time: 2022-11-18 15:00:04, duration: 1.48459852s, start_voltage: 8004, end_voltage: 8073)
+		RealignmentAction(start_time: 2022-11-18 15:00:17, end_time: 2022-11-18 15:00:19, duration: 1.294400135s, start_voltage: 8004, end_voltage: 7907)
+		RealignmentAction(start_time: 2022-11-18 15:00:35, end_time: 2022-11-18 15:00:37, duration: 1.196571843s, start_voltage: 8045, end_voltage: 7948)
+		RealignmentAction(start_time: 2022-11-18 15:00:58, end_time: 2022-11-18 15:00:59, duration: 1.292128942s, start_voltage: 8059, end_voltage: 7976)
+		RealignmentAction(start_time: 2022-11-18 15:01:13, end_time: 2022-11-18 15:01:14, duration: 1.400291321s, start_voltage: 7962, end_voltage: 7990)
+		RealignmentAction(start_time: 2022-11-18 15:01:27, end_time: 2022-11-18 15:01:29, duration: 1.412397976s, start_voltage: 8017, end_voltage: 8059)
+		RealignmentAction(start_time: 2022-11-18 15:01:30, end_time: 2022-11-18 15:01:31, duration: 1.204248673s, start_voltage: 7893, end_voltage: 8059)
+		RealignmentAction(start_time: 2022-11-18 15:01:48, end_time: 2022-11-18 15:01:49, duration: 1.384210801s, start_voltage: 7879, end_voltage: 8059)

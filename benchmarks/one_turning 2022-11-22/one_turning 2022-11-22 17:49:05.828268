@@ -1,0 +1,68 @@
+Robot configuration: one_turning
+
+Total run:
+	start_time: 2022-11-22 17:43:20
+	end_time: 2022-11-22 17:49:05
+	total_duration: 344.846395584s
+	start_voltage: 7898
+	end_voltage: 7858
+
+Intersections:
+	total_duration: Duration(nanoseconds=241198609561)
+	count: 17
+	individual intersection scans:
+		IntersectionScanAction(start_time: 2022-11-22 17:43:24, end_time: 2022-11-22 17:43:39, duration: 14.699922117s)
+		IntersectionScanAction(start_time: 2022-11-22 17:43:44, end_time: 2022-11-22 17:43:59, duration: 14.799778211s)
+		IntersectionScanAction(start_time: 2022-11-22 17:44:03, end_time: 2022-11-22 17:44:21, duration: 18.101220298s)
+		IntersectionScanAction(start_time: 2022-11-22 17:44:31, end_time: 2022-11-22 17:44:45, duration: 14.499823728s)
+		IntersectionScanAction(start_time: 2022-11-22 17:44:49, end_time: 2022-11-22 17:45:08, duration: 18.291097276s)
+		IntersectionScanAction(start_time: 2022-11-22 17:45:12, end_time: 2022-11-22 17:45:26, duration: 14.301261486s)
+		IntersectionScanAction(start_time: 2022-11-22 17:45:31, end_time: 2022-11-22 17:45:49, duration: 18.499152728s)
+		IntersectionScanAction(start_time: 2022-11-22 17:45:53, end_time: 2022-11-22 17:46:08, duration: 14.49943066s)
+		IntersectionScanAction(start_time: 2022-11-22 17:46:11, end_time: 2022-11-22 17:46:21, duration: 10.098569651s)
+		IntersectionScanAction(start_time: 2022-11-22 17:46:30, end_time: 2022-11-22 17:46:44, duration: 13.899209868s)
+		IntersectionScanAction(start_time: 2022-11-22 17:46:48, end_time: 2022-11-22 17:46:59, duration: 10.499936461s)
+		IntersectionScanAction(start_time: 2022-11-22 17:47:09, end_time: 2022-11-22 17:47:23, duration: 14.401426556s)
+		IntersectionScanAction(start_time: 2022-11-22 17:47:27, end_time: 2022-11-22 17:47:37, duration: 10.098938808s)
+		IntersectionScanAction(start_time: 2022-11-22 17:47:41, end_time: 2022-11-22 17:47:55, duration: 14.508051991s)
+		IntersectionScanAction(start_time: 2022-11-22 17:47:59, end_time: 2022-11-22 17:48:14, duration: 14.700820075s)
+		IntersectionScanAction(start_time: 2022-11-22 17:48:18, end_time: 2022-11-22 17:48:34, duration: 15.299647036s)
+		IntersectionScanAction(start_time: 2022-11-22 17:48:37, end_time: 2022-11-22 17:48:47, duration: 10.000322611s)
+
+Realignments:
+	total_duration: Duration(nanoseconds=47785992645)
+	count: 33
+	individual realignments:
+		RealignmentAction(start_time: 2022-11-22 17:43:24, end_time: 2022-11-22 17:43:24, duration: 0.099399032s)
+		RealignmentAction(start_time: 2022-11-22 17:43:40, end_time: 2022-11-22 17:43:41, duration: 1.300900079s)
+		RealignmentAction(start_time: 2022-11-22 17:43:42, end_time: 2022-11-22 17:43:43, duration: 0.799822674s)
+		RealignmentAction(start_time: 2022-11-22 17:43:44, end_time: 2022-11-22 17:43:44, duration: 0.099291577s)
+		RealignmentAction(start_time: 2022-11-22 17:44:00, end_time: 2022-11-22 17:44:01, duration: 0.999594769s)
+		RealignmentAction(start_time: 2022-11-22 17:44:01, end_time: 2022-11-22 17:44:02, duration: 0.900506825s)
+		RealignmentAction(start_time: 2022-11-22 17:44:21, end_time: 2022-11-22 17:44:23, duration: 1.2998508s)
+		RealignmentAction(start_time: 2022-11-22 17:44:24, end_time: 2022-11-22 17:44:29, duration: 5.500334677s)
+		RealignmentAction(start_time: 2022-11-22 17:44:46, end_time: 2022-11-22 17:44:47, duration: 0.801988527s)
+		RealignmentAction(start_time: 2022-11-22 17:44:47, end_time: 2022-11-22 17:44:48, duration: 0.89858859s)
+		RealignmentAction(start_time: 2022-11-22 17:45:08, end_time: 2022-11-22 17:45:10, duration: 1.598790029s)
+		RealignmentAction(start_time: 2022-11-22 17:45:27, end_time: 2022-11-22 17:45:28, duration: 1.000287983s)
+		RealignmentAction(start_time: 2022-11-22 17:45:28, end_time: 2022-11-22 17:45:29, duration: 1.100084635s)
+		RealignmentAction(start_time: 2022-11-22 17:45:31, end_time: 2022-11-22 17:45:31, duration: 0.198674103s)
+		RealignmentAction(start_time: 2022-11-22 17:45:49, end_time: 2022-11-22 17:45:51, duration: 1.200148312s)
+		RealignmentAction(start_time: 2022-11-22 17:45:53, end_time: 2022-11-22 17:45:53, duration: 0.200221814s)
+		RealignmentAction(start_time: 2022-11-22 17:46:09, end_time: 2022-11-22 17:46:09, duration: 0.899348261s)
+		RealignmentAction(start_time: 2022-11-22 17:46:21, end_time: 2022-11-22 17:46:22, duration: 1.100551143s)
+		RealignmentAction(start_time: 2022-11-22 17:46:24, end_time: 2022-11-22 17:46:30, duration: 5.500077648s)
+		RealignmentAction(start_time: 2022-11-22 17:46:45, end_time: 2022-11-22 17:46:46, duration: 0.899932292s)
+		RealignmentAction(start_time: 2022-11-22 17:46:47, end_time: 2022-11-22 17:46:48, duration: 1.100811878s)
+		RealignmentAction(start_time: 2022-11-22 17:46:59, end_time: 2022-11-22 17:47:01, duration: 1.600488558s)
+		RealignmentAction(start_time: 2022-11-22 17:47:03, end_time: 2022-11-22 17:47:08, duration: 5.499131737s)
+		RealignmentAction(start_time: 2022-11-22 17:47:23, end_time: 2022-11-22 17:47:24, duration: 0.900902231s)
+		RealignmentAction(start_time: 2022-11-22 17:47:25, end_time: 2022-11-22 17:47:26, duration: 0.899514606s)
+		RealignmentAction(start_time: 2022-11-22 17:47:37, end_time: 2022-11-22 17:47:39, duration: 1.192587338s)
+		RealignmentAction(start_time: 2022-11-22 17:47:55, end_time: 2022-11-22 17:47:56, duration: 1.301354899s)
+		RealignmentAction(start_time: 2022-11-22 17:48:14, end_time: 2022-11-22 17:48:15, duration: 1.197292285s)
+		RealignmentAction(start_time: 2022-11-22 17:48:16, end_time: 2022-11-22 17:48:17, duration: 0.800066609s)
+		RealignmentAction(start_time: 2022-11-22 17:48:18, end_time: 2022-11-22 17:48:18, duration: 0.399658663s)
+		RealignmentAction(start_time: 2022-11-22 17:48:34, end_time: 2022-11-22 17:48:35, duration: 0.899894579s)
+		RealignmentAction(start_time: 2022-11-22 17:48:37, end_time: 2022-11-22 17:48:37, duration: 0.096538579s)
+		RealignmentAction(start_time: 2022-11-22 17:48:47, end_time: 2022-11-22 17:48:53, duration: 5.499356913s)
